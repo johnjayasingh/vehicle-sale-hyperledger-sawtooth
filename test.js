@@ -33,31 +33,21 @@ const signer = new CryptoFactory(context).newSigner(privateKey);
 
 
 // Prepare a payload
-const payload = {
-    Name: 'Does not matter as we have not implemented any check'
-}
+const payload = "Test ME";
+const payloadBytes = Buffer.from(payload);
 
-// Input for one transaction
-const payloadBytes = Buffer.from(JSON.stringify(payload))
 
 // Payload -> Transaction -> TransactionList -> Batch -> BatchList -> Byte -> REST_API
 // Prepare Transaction Header
 
-const _hash = (x) =>
-    createHash('sha512').update(x).digest('hex').toLowerCase()
-
-
-const TP_FAMILY = 'intkey';
-const TP_NAMESPACE = _hash(TP_FAMILY).substr(0, 6);
-const TP_VERSION = '1.0';
-let address = TP_NAMESPACE + _hash('foo').slice(-64)
 
 const transactionHeaderBytes = protobuf.TransactionHeader.encode({
-    familyName: TP_FAMILY,
-    familyVersion: TP_VERSION,
-    inputs: [address],
-    outputs: [address],
+    familyName: 'intkey',
+    familyVersion: '1.0',
+    inputs: ['1cf126'],
+    outputs: ['1cf126'],
     signerPublicKey: signer.getPublicKey().asHex(),
+    nonce: `${Math.random()}`,
     batcherPublicKey: signer.getPublicKey().asHex(),
     dependencies: [],
     payloadSha512: createHash('sha512').update(payloadBytes).digest('hex')
@@ -88,12 +78,12 @@ const batchListBytes = protobuf.BatchList.encode({
 
 // Forward
 
-axios.post('http://localhost:8008/batches',batchListBytes, {
+axios.post('http://localhost:8008/batches', batchListBytes, {
     headers: {
         'Content-Type': 'application/octet-stream'
     },
 } ).then((res)=> {
     console.log(res.data);
 }).catch((err)=>{
-    console.log(err.response.data)
+    console.log(err)
 })
