@@ -9,12 +9,12 @@ const port = process.env.PORT || 8080;
 
 // Setup 
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 
 // Register routes
-app.get('/health', (req,res)=>{
+app.get('/health', (req, res) => {
     res.json({
         message: 'Running'
     })
@@ -22,7 +22,17 @@ app.get('/health', (req,res)=>{
 app.use('/auth', user)
 
 
-// Server run
-app.listen(port, '0.0.0.0',()=>{
-    console.log(`Server running over here http://localhost:${port}/health`)
-})
+const start = async () => {
+    try {
+        const mongoose = require('mongoose');
+        await mongoose.connect('mongodb://localhost:27017/vin-sell');
+        // Server run
+        app.listen(port, '0.0.0.0', () => {
+            console.log(`Server running over here http://localhost:${port}/health`)
+        })
+    } catch (error) {
+        console.error('Failed to get the server running', error)
+    }
+}
+
+start();

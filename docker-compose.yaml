@@ -3,6 +3,12 @@ version: "2.1"
 
 services:
 
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+
   settings-tp:
     image: hyperledger/sawtooth-settings-tp:chime
     container_name: sawtooth-settings-tp-default
