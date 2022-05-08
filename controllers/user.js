@@ -1,9 +1,39 @@
 const User = require('../schemas/user');
 const { createPrivateKey } = require('../service/credential')
 const registerUserSchema = require('../validations/register-user')
+const loginUserSchema = require('../validations/login-user')
+const jwt = require('jsonwebtoken');
+const { SECRET } = require('../config');
 
-const users = {
 
+exports.loginUser = async (req, res) => {
+    const valid = loginUserSchema.validate(req.body);
+    if (valid.error) {
+        // TODO meaningful error insight
+        return res.json(valid.error.details).status(400);
+    }
+    const { username, password } = valid.value
+    const user = await User.findOne({
+        username,
+        password,
+    })
+    if (!user) {
+        return res.status(400).json({
+            message: 'Username or password incorrect'
+        })
+    }
+    const { publicKey } = user;
+    const token = jwt.sign({
+        username,
+        publicKey
+    }, SECRET, {
+        expiresIn: '1800s'
+    })
+    return res.json(
+        {
+            access_token: token
+        }
+    )
 }
 
 exports.registerUser = async (req, res) => {

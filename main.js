@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
-const user = require('./routes/user')
+const user = require('./routes/user');
+const { SECRET } = require('./config');
 
 const port = process.env.PORT || 8080;
 
@@ -20,6 +22,23 @@ app.get('/health', (req, res) => {
     })
 })
 app.use('/auth', user)
+
+app.use('/api', function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, SECRET, (err, user) => {
+        console.log(err)
+
+        if (err) return res.sendStatus(403)
+
+        req.user = user
+
+        next()
+    })
+}, (req, res) => res.json({ 'Ok': 'Ok', ...req.user }))
 
 
 const start = async () => {
