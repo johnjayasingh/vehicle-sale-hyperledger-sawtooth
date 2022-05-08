@@ -51,10 +51,11 @@ exports.registerUser = async (req, res) => {
         })
     }
     const { privateKey, publicKey } = createPrivateKey();
-    const { username, name } = req.body;
+    const { username, name, password } = valid.value;
     await User.create({
         username,
         name,
+        password,
         privateKey,
         publicKey
     })
