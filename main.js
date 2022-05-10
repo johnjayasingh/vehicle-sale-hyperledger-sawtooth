@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -43,7 +44,6 @@ app.use('/api', function authenticateToken(req, res, next) {
 
 const start = async () => {
     try {
-        const mongoose = require('mongoose');
         await mongoose.connect('mongodb://localhost:27017/vin-sell');
         // Server run
         app.listen(port, '0.0.0.0', () => {
