@@ -39,8 +39,6 @@ class VinSellHandler extends TransactionHandler {
             default:
                 throw new InvalidTransaction('Invalid Action Type')
         }
-
-        throw new InvalidTransaction('Nothing implemented')
     }
 
 }
