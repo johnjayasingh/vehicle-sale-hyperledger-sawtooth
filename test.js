@@ -5,7 +5,8 @@ const axios = require('axios').default;
 
 const { Secp256k1PrivateKey }  = require('sawtooth-sdk-js/signing/secp256k1');
 const { CryptoFactory, createContext }  =require('sawtooth-sdk-js/signing')
-const protobuf = require('sawtooth-sdk-js/protobuf')
+const protobuf = require('sawtooth-sdk-js/protobuf');
+const { family, actions } = require('./constants');
 
 
 // This create a new private key and returns hex version of the key
@@ -33,7 +34,10 @@ const signer = new CryptoFactory(context).newSigner(privateKey);
 
 
 // Prepare a payload
-const payload = "Test ME";
+const payload = JSON.stringify({
+    id: 'REALMAD123',
+    action: actions.register_vehicle,
+});
 const payloadBytes = Buffer.from(payload);
 
 
@@ -42,10 +46,10 @@ const payloadBytes = Buffer.from(payload);
 
 
 const transactionHeaderBytes = protobuf.TransactionHeader.encode({
-    familyName: 'intkey',
-    familyVersion: '1.0',
-    inputs: ['1cf126'],
-    outputs: ['1cf126'],
+    familyName: family.name,
+    familyVersion: family.version,
+    inputs: [family.namespace],
+    outputs: [family.namespace],
     signerPublicKey: signer.getPublicKey().asHex(),
     nonce: `${Math.random()}`,
     batcherPublicKey: signer.getPublicKey().asHex(),
